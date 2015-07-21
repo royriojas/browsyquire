@@ -48,6 +48,7 @@ var clientTests = [
     'independent-overrides'
   , 'manipulating-overrides'
   , 'noCallThru'
+  , 'noCallThru-global'
   , 'argument-validation'
   , 'require-in-method'
 ];

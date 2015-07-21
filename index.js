@@ -27,6 +27,7 @@ function validateArguments(request, stubs) {
 }
 
 var stubs;
+var noCallThruGlobal = false;
 
 function stub(stubs_) {
   stubs = stubs_;
@@ -38,6 +39,7 @@ function stub(stubs_) {
 
 function reset() {
   stubs = undefined;
+  noCallThruGlobal = false;
   module.exports._cache = null;
 }
 
@@ -62,12 +64,27 @@ var proxyquire = module.exports = function (require_) {
 
     return dep;
   };
+  
+  prxCall.noCallThru = function () {
+    noCallThruGlobal = true;
+  };
 
-  prxCall._reset = reset;
+  prxCall.reset = reset;
   return prxCall;
 };
 
+var clsc = function () {
+  var args = arguments;
 
+  args = [].slice.call( args );
+  for (var i = 0, len = args.length; i < len; i++) {
+    var current = args[ i ];
+    if ( typeof current !== 'undefined' && current !== null  ) {
+      return current;
+    }
+  }
+  return null;
+};
 // Start with the default cache
 proxyquire._cache = null;
 
@@ -82,8 +99,16 @@ proxyquire._proxy = function (require_, request) {
 
   if (!stub) return original();
 
-  var stubWideNoCallThru = !!stubs['@noCallThru'] && stub['@noCallThru'] !== false;
-  var noCallThru = stubWideNoCallThru || !!stub['@noCallThru'];
+  var noCallThru = false;
+  
+  if (!noCallThruGlobal) {
+    var stubWideNoCallThru = !!stubs['@noCallThru'] && stub['@noCallThru'] !== false;
+    noCallThru = stubWideNoCallThru || !!stub['@noCallThru'];  
+  }
+  else {
+    noCallThru = clsc(stub['@noCallThru'], stubs['@noCallThru'], noCallThruGlobal)
+  }
+  
   return noCallThru ? stub : fillMissingKeys(stub, original());
 };
 
