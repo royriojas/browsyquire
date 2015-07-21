@@ -67,6 +67,7 @@ var proxyquire = module.exports = function (require_) {
   
   prxCall.noCallThru = function () {
     noCallThruGlobal = true;
+    return prxCall;
   };
 
   prxCall.reset = reset;
