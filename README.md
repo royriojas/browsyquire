@@ -121,11 +121,12 @@ var browsyquire = require('browsyquire')(require);
 browsyquire.noCallThru();
 ```
 
-Original Readme below.
 
-==========================
 
-# proxyquireify [![build status](https://secure.travis-ci.org/thlorenz/proxyquireify.svg?branch=master)](http://travis-ci.org/thlorenz/proxyquireify)
+**Original Readme below.**
+
+
+# proxyquireify
 
 browserify `>= v2` version of [proxyquire](https://github.com/thlorenz/proxyquire).
 
