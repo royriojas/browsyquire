@@ -14,7 +14,6 @@
   "homepage": "https://github.com/royriojas/browsyquire",
   "dependencies": {
     "browser-pack": "^3.0.0",
-    "browserify-transform-tools": "^1.4.2",
     "detective": "~3.1.0",
     "fill-keys": "^1.0.0",
     "has-require": "^1.1.0",
