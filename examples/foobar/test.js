@@ -1,7 +1,5 @@
 'use strict';
 
-var proxyquire = require('browsyquire')(require);
-
 var stubs = {
   './bar': {
       wunder: function () { return 'wirklich wunderbar'; }
@@ -9,5 +7,5 @@ var stubs = {
   }
 };
 
-var foo = proxyquire('./src/foo', stubs);
+var foo = mockquire('./src/foo', stubs);
 console.log(foo());

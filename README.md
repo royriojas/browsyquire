@@ -3,16 +3,19 @@
 **IMPORTANT** This is a fork of the awesome [proxyquireify](http://travis-ci.org/thlorenz/proxyquireify). All credit is for the original authors.
 
 This fork adds the following features:
-- [Wraps the "require magic" in a function](https://github.com/thlorenz/proxyquireify/pull/39) to prevent it from being executed but still allow browserify to include the proxied module in the bundle.
-- Allows to mock dependencies that are outside of the main require flow (like [inside a method that is executed after the mock was created](https://github.com/thlorenz/proxyquireify/issues/40)).
-- Enable [noCallThru globally](https://github.com/thlorenz/proxyquireify/issues/37). It adds a `noCallThru` function that can be called to indicate you want all your stubs to behave like if they have the property `'@noCallThru': true` on them. You can still override the ones that
+- [Wraps the "require magic" in a function](https://github.com/thlorenz/proxyquireify/pull/39)
+  to prevent it from being executed but still allow browserify to include the proxied module
+  in the bundle.
+- Allows to mock dependencies that are outside of the main require flow
+  (like [inside a method that is executed after the mock was created](https://github.com/thlorenz/proxyquireify/issues/40)).
+- Enable [noCallThru globally](https://github.com/thlorenz/proxyquireify/issues/37).
+  It adds a `noCallThru` function that can be called to indicate you want all your stubs to behave like if they have the property `'@noCallThru': true` on them. You can still override this behavior on each stub if desired by adding the property `@noCallThru` and set it to false.
+- injects a function called `mockquire` to the modules that reference it. This function is
+  just an alias to browsyquire, but is convenient to use because you don't need to pass the local
+  require that is done automatically.
 
   ```javascript
-  // this will make all mocks behave like if they have a property
-  // `'@noCallThru': true` on the passed stubs object. If you don't want the
-  // original module to execute at all. Still this can be overriden on a particular
-  // stub if you still want to call the original methods of a stub.
-  var proxyquire = require( 'browsyquire' )( require ).noCallThru();
+  var mockquire = require('browsyquire')(require);
   ```
 
 ## installing
@@ -21,13 +24,101 @@ This fork adds the following features:
 npm i browsyquire
 ```
 
-## using it
+## using it in browserify
+
+```javascript
+var fs         = require('fs')
+  , proxyquire = require('browsyquire')
+  , browserify = require('browserify')
+  ;
+
+browserify({ debug: true })
+  .plugin(proxyquire.plugin) // !!do not forget to pass the plugin...
+  .require(require.resolve('./test'), { entry: true })
+  .bundle()
+  .pipe(fs.createWriteStream(__dirname + '/bundle.js'));
+```
+
+And inside your tests:
+
+```javascript
+'use strict';
+
+var stubs = {
+  './bar': {
+      wunder: function () { return 'wirklich wunderbar'; }
+    , kinder: function () { return 'schokolade'; }
+  }
+};
+
+var foo = mockquire('./src/foo', stubs); // mockquire will be defined... I promise :)
+console.log(foo());
+```
+
+## using it as a drop in replacement
 
 ```javascript
 // it is a drop in replacement for proxyquireify, so just do:
 // It works exactly like the original but with the added behavior
 // described above.
 var proxyquire = require('browsyquire')(require);
+```
+
+## Using the `mockquire` method
+
+```javascript
+//===> mouth.js
+module.exports = {
+  saySomething: function () {
+    return 'blah';
+  }
+};
+
+//===> speaker.js
+module.exports = {
+  speak: function () {
+    return require('./mouth').saySomething();
+  }
+};
+
+describe('a test', function () {
+  describe('it should not say blah, but foo', function () {
+    var speaker = mockquire('./speaker', {
+      './mouth': {
+        saySomething: function () {
+          return 'foo'
+        }
+      });
+    var result = speaker.speak();
+    expect(result).to.equal('foo'); // not blah! cause overriden by stub
+  });
+});
+```
+
+The `mockquire` function has 2 methods
+
+### reset
+Clears the stub cache. This is done automatically after each mockquire call, but can also be called manually if for any reason there is a need to clear it.
+
+```javascript
+// using mockquire
+mockquire.reset(); // clear the stubs cache
+
+// using the old api
+var browsyquire = require('browsyquire')(require);
+browsyquire.reset();
+```
+
+### noCallThru
+Configure `browsyquire` to assume all stubs have the `@noCallThru` property set to true.
+
+```javascript
+// using mockquire
+mockquire.noCallThru();
+
+// using the old api
+var browsyquire = require('browsyquire')(require);
+browsyquire.noCallThru();
 ```
 
 Original Readme below.
