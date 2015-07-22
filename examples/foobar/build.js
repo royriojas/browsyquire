@@ -1,5 +1,5 @@
 var fs         = require('fs')
-  , proxyquire = require('proxyquireify')
+  , proxyquire = require('browsyquire')
   , browserify = require('browserify')
   ;
 

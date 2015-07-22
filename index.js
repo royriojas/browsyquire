@@ -64,7 +64,7 @@ var proxyquire = module.exports = function (require_) {
 
     return dep;
   };
-  
+
   prxCall.noCallThru = function () {
     noCallThruGlobal = true;
     return prxCall;
@@ -101,15 +101,15 @@ proxyquire._proxy = function (require_, request) {
   if (!stub) return original();
 
   var noCallThru = false;
-  
+
   if (!noCallThruGlobal) {
     var stubWideNoCallThru = !!stubs['@noCallThru'] && stub['@noCallThru'] !== false;
-    noCallThru = stubWideNoCallThru || !!stub['@noCallThru'];  
+    noCallThru = stubWideNoCallThru || !!stub['@noCallThru'];
   }
   else {
     noCallThru = clsc(stub['@noCallThru'], stubs['@noCallThru'], noCallThruGlobal)
   }
-  
+
   return noCallThru ? stub : fillMissingKeys(stub, original());
 };
 

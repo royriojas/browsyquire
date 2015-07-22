@@ -1,7 +1,7 @@
 'use strict';
 /*jshint asi: true, browser: true */
 
-var proxyquire =  require('proxyquireify')(require)
+var proxyquire =  require('browsyquire')(require)
   , barber     =  { bar: function () { return 'barber'; } }
   ;
 
@@ -17,6 +17,6 @@ test('\noverriding dep with stub and manipulating stub afterwards', function (t)
 
   barber.bar = undefined;
 
-  t.throws(foober.bigBar, /Property 'bar' of object #<Object> is not a function/, 'returns undefined when I delete an override later')  
+  t.throws(foober.bigBar, /Property 'bar' of object #<Object> is not a function/, 'returns undefined when I delete an override later')
   t.end()
 })

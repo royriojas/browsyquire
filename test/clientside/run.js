@@ -9,7 +9,7 @@ var test       =  require('tape');
 function compile(name, cb) {
   browserify()
     .plugin(proxyquire.plugin)
-    .require(require.resolve('../..'), { expose: 'proxyquireify' })
+    .require(require.resolve('../..'), { expose: 'browsyquire' })
     .require(require.resolve('./' + name), { entry: true })
     .bundle(function (err, src) {
       if (err) return cb(err);

@@ -3,6 +3,6 @@
 var proxy,
     path = require("path")
 
-proxy = require("proxyquireify")(require);
+proxy = require("browsyquire")(require);
 
 var depuno = proxy("./depuno", { path: { extname: function () { return 'blah'; } } });

@@ -1,7 +1,7 @@
 'use strict';
 /*jshint asi: true, browser: true */
 
-var proxyquire =  require('proxyquireify')(require)
+var proxyquire =  require('browsyquire')(require)
   , barber     =  { bar: function () { return 'barber'; } }
   ;
 

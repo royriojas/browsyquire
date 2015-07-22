@@ -1,7 +1,7 @@
 {
   "name": "foobar",
   "version": "0.0.0",
-  "description": "proxyquireify foobar example",
+  "description": "browsyquire foobar example",
   "scripts": {
     "test": "node build && open index.html"
   },

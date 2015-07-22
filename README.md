@@ -1,6 +1,42 @@
+# browsyquire [![build status](https://secure.travis-ci.org/royriojas/browsyquire.svg?branch=master)](http://travis-ci.org/royriojas/browsyquire)
+
+**IMPORTANT** This is a fork of the awesome [proxyquireify](http://travis-ci.org/thlorenz/proxyquireify). All credit is for the original authors.
+
+This fork adds the following features:
+- [Wraps the "require magic" in a function](https://github.com/thlorenz/proxyquireify/pull/39) to prevent it from being executed but still allow browserify to include the proxied module in the bundle.
+- Allows to mock dependencies that are outside of the main require flow (like [inside a method that is executed after the mock was created](https://github.com/thlorenz/proxyquireify/issues/40)).
+- Enable [noCallThru globally](https://github.com/thlorenz/proxyquireify/issues/37). It adds a `noCallThru` function that can be called to indicate you want all your stubs to behave like if they have the property `'@noCallThru': true` on them. You can still override the ones that
+
+  ```javascript
+  // this will make all mocks behave like if they have a property
+  // `'@noCallThru': true` on the passed stubs object. If you don't want the
+  // original module to execute at all. Still this can be overriden on a particular
+  // stub if you still want to call the original methods of a stub.
+  var proxyquire = require( 'browsyquire' )( require ).noCallThru();
+  ```
+
+## installing
+
+```bash
+npm i browsyquire
+```
+
+## using it
+
+```javascript
+// it is a drop in replacement for proxyquireify, so just do:
+// It works exactly like the original but with the added behavior
+// described above.
+var proxyquire = require('browsyquire')(require);
+```
+
+Original Readme below.
+
+==========================
+
 # proxyquireify [![build status](https://secure.travis-ci.org/thlorenz/proxyquireify.svg?branch=master)](http://travis-ci.org/thlorenz/proxyquireify)
 
-browserify `>= v2` version of [proxyquire](https://github.com/thlorenz/proxyquire). 
+browserify `>= v2` version of [proxyquire](https://github.com/thlorenz/proxyquire).
 
 Proxies browserify's require in order to make overriding dependencies during testing easy while staying **totally unobstrusive**. To run your tests in both Node and the browser, use [proxyquire-universal](https://github.com/bendrucker/proxyquire-universal).
 
@@ -31,7 +67,7 @@ Proxies browserify's require in order to make overriding dependencies during tes
 - mocking framework agnostic, if it can stub a function then it works with **proxyquireify**
 - "use strict" compliant
 - [automatic injection](https://github.com/thlorenz/proxyquireify#important-magic) of `require` calls to ensure the
-  module you are testing gets bundled 
+  module you are testing gets bundled
 
 ## Installation
 
@@ -39,7 +75,7 @@ Proxies browserify's require in order to make overriding dependencies during tes
 
 To use with browserify `< 5.1` please `npm install proxyquireify@0.5` instead. To run your tests in PhantomJS, you may need to [use a shim](https://github.com/bendrucker/phantom-ownpropertynames).
 
-## Example 
+## Example
 
 **foo.js**:
 
@@ -56,8 +92,8 @@ module.exports = function () {
 ```js
 var proxyquire = require('proxyquireify')(require);
 
-var stubs = { 
-  './bar': { 
+var stubs = {
+  './bar': {
       wunder: function () { return 'wirklich wunderbar'; }
     , kinder: function () { return 'schokolade'; }
   }
@@ -65,7 +101,7 @@ var stubs = {
 
 var foo = proxyquire('./src/foo', stubs);
 
-console.log(foo()); 
+console.log(foo());
 ```
 
 **browserify.build.js**:
@@ -150,7 +186,7 @@ proxyquire.browserify()
 
 - **request**: path to the module to be tested e.g., `../lib/foo`
 - **stubs**: key/value pairs of the form `{ modulePath: stub, ... }`
-  - module paths are relative to the tested module **not** the test file 
+  - module paths are relative to the tested module **not** the test file
   - therefore specify it exactly as in the require statement inside the tested file
   - values themselves are key/value pairs of functions/properties and the appropriate override
 
@@ -161,7 +197,7 @@ var barStub    =  { wunder: function () { 'really wonderful'; } };
 var foo = proxyquire('./foo', { './bar': barStub })
 ```
 
-#### Important Magic 
+#### Important Magic
 
 In order for browserify to include the module you are testing in the bundle, **proxyquireify** will inject a
 `require()` call for every module you are proxyquireing. So in the above example `require('./foo')` will be injected at

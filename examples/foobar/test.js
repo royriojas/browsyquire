@@ -1,9 +1,9 @@
 'use strict';
 
-var proxyquire = require('proxyquireify')(require);
+var proxyquire = require('browsyquire')(require);
 
-var stubs = { 
-  './bar': { 
+var stubs = {
+  './bar': {
       wunder: function () { return 'wirklich wunderbar'; }
     , kinder: function () { return 'schokolade'; }
   }

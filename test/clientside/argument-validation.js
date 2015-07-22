@@ -1,7 +1,7 @@
 'use strict';
 /*jshint asi: true, browser: true */
 
-var proxyquire =  require('proxyquireify')(require)
+var proxyquire =  require('browsyquire')(require)
   , bar = { bar: function () { return 'bar'; } }
 
 function throws(t, action, regex, desc) {
@@ -44,12 +44,12 @@ test('\nillegal parameters give meaningful errors', function (t) {
 })
 
 test('\nuninitialized proxyquire', function (t) {
-  var uninitialized = require('proxyquireify')
+  var uninitialized = require('browsyquire')
   throws(
       t
     , uninitialized.bind(null, '../fixtures/foo', {})
     , /It seems like you didn't initialize proxyquireify with the require in your test/
     , 'throws when proxyquireify was not initialized with require'
   )
-  t.end()      
+  t.end()
 });
