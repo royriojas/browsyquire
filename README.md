@@ -10,12 +10,23 @@ This fork adds the following features:
   (like [inside a method that is executed after the mock was created](https://github.com/thlorenz/proxyquireify/issues/40)).
 - Enable [noCallThru globally](https://github.com/thlorenz/proxyquireify/issues/37).
   It adds a `noCallThru` function that can be called to indicate you want all your stubs to behave like if they have the property `'@noCallThru': true` on them. You can still override this behavior on each stub if desired by adding the property `@noCallThru` and set it to false.
-- injects a function called `mockquire` to the modules that reference it. This function is
-  just an alias to browsyquire, but is convenient to use because you don't need to pass the local
-  require that is done automatically.
+- injects a function called `mockquire` to the modules that reference it.
+  This function is just an alias to browsyquire, but is convenient to use
+  because you don't need to pass the local require, that is done automatically.
+
+  So basically if you use `mockquire('some-module')` then the following code will
+  prepend to your code
 
   ```javascript
-  var mockquire = require('browsyquire')(require);
+  var mockquire = require('browsyquire')(require); mockquire.noCallThru();
+  ```
+
+  This will inject the mockquire function and configure it **to not call the
+  original methods of your stub**. If you want to use mockquire and still want
+  to call the original methods of your stubs you can do:
+
+  ```javascript
+  mockquire.reset(); // add this at the top of your testing code
   ```
 
 ## installing
@@ -81,6 +92,7 @@ module.exports = {
   }
 };
 
+//===> some test
 describe('a test', function () {
   describe('it should not say blah, but foo', function () {
     var speaker = mockquire('./speaker', {
