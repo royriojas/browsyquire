@@ -39,7 +39,6 @@ function stub(stubs_) {
 
 function reset() {
   stubs = undefined;
-  noCallThruGlobal = false;
   module.exports._cache = null;
 }
 
@@ -67,6 +66,11 @@ var proxyquire = module.exports = function (require_) {
 
   prxCall.noCallThru = function () {
     noCallThruGlobal = true;
+    return prxCall;
+  };
+
+  prxCall.callThru = function () {
+    noCallThruGlobal = false;
     return prxCall;
   };
 
