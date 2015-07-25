@@ -15,18 +15,30 @@ This fork adds the following features:
   because you don't need to pass the local require, that is done automatically.
 
   So basically if you use `mockquire('some-module')` then the following code will
-  prepend to your code
+  prepend to your code.
 
   ```javascript
-  var mockquire = require('browsyquire')(require); mockquire.noCallThru();
+  var mockquire = require('browsyquire')(require); mockquire.reset(); mockquire.noCallThru();
   ```
 
-  This will inject the mockquire function and configure it **to not call the
+  This will inject the mockquire function and configure it to **reset the cache**, so calls from other modules don't interfere with the current one. And **to not call the
   original methods of your stub**. If you want to use mockquire and still want
   to call the original methods of your stubs you can do:
 
   ```javascript
-  mockquire.reset(); // add this at the top of your testing code
+  mockquire.callThru(); // add this at the top of your testing code
+  ```
+
+  **NOTE**: It is advisable to always clear the cache with `reset` after your tests to
+  prevent the normal `require` calls be confused by the cache created by `browsyquire`
+
+  e.g:
+
+  ```javascript
+  // in mocha
+  afterEach(function () {
+    mockquire.reset();
+  });
   ```
 
 ## installing
