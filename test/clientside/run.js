@@ -50,6 +50,7 @@ var clientTests = [
   , 'noCallThru'
   , 'noCallThru-global'
   , 'argument-validation'
+  , 'replace-with-null'
   , 'require-in-method'
 ];
 

@@ -1,40 +1,38 @@
 'use strict';
 
-var fillMissingKeys = require('fill-keys');
+var fillMissingKeys = require( 'fill-keys' );
 
-function ProxyquireifyError(msg) {
+function ProxyquireifyError( msg ) {
   this.name = 'ProxyquireifyError';
-  Error.captureStackTrace(this, ProxyquireifyError);
+  Error.captureStackTrace( this, ProxyquireifyError );
   this.message = msg || 'An error occurred inside proxyquireify.';
 }
 
-function validateArguments(request, stubs) {
+function validateArguments( request, stubs ) {
   var msg = (function getMessage() {
-    if (!request)
+    if ( !request )
       return 'Missing argument: "request". Need it to resolve desired module.';
-
-    if (!stubs)
+    if ( !stubs )
       return 'Missing argument: "stubs". If no stubbing is needed, use regular require instead.';
-
-    if (typeof request != 'string')
+    if ( typeof request != 'string' )
       return 'Invalid argument: "request". Needs to be a requirable string that is the module to load.';
-
-    if (typeof stubs != 'object')
+    if ( typeof stubs != 'object' )
       return 'Invalid argument: "stubs". Needs to be an object containing overrides e.g., {"path": { extname: function () { ... } } }.';
   })();
 
-  if (msg) throw new ProxyquireifyError(msg);
+  if ( msg )
+    throw new ProxyquireifyError( msg );
 }
 
 var stubs;
 var noCallThruGlobal = false;
 
-function stub(stubs_) {
+function stub( stubs_ ) {
   stubs = stubs_;
   // This cache is used by the prelude as an alternative to the regular cache.
   // It is not read or written here, except to set it to an empty object when
   // adding stubs and to reset it to null when clearing stubs.
-  module.exports._cache = {};
+  module.exports._cache = { };
 }
 
 function reset() {
@@ -42,23 +40,23 @@ function reset() {
   module.exports._cache = null;
 }
 
-var proxyquire = module.exports = function (require_) {
-  if (typeof require_ != 'function')
+var proxyquire = module.exports = function ( require_ ) {
+  if ( typeof require_ != 'function' )
     throw new ProxyquireifyError(
-        'It seems like you didn\'t initialize proxyquireify with the require in your test.\n'
-      + 'Make sure to correct this, i.e.: "var proxyquire = require(\'proxyquireify\')(require);"'
+      'It seems like you didn\'t initialize proxyquireify with the require in your test.\n'
+        + 'Make sure to correct this, i.e.: "var proxyquire = require(\'proxyquireify\')(require);"'
     );
 
   reset();
 
-  var prxCall = function(request, stubs) {
+  var prxCall = function ( request, stubs ) {
 
-    validateArguments(request, stubs);
+    validateArguments( request, stubs );
 
     // set the stubs and require dependency
     // when stub require is invoked by the module under test it will find the stubs here
-    stub(stubs);
-    var dep = require_(request);
+    stub( stubs );
+    var dep = require_( request );
     //reset();
 
     return dep;
@@ -81,10 +79,10 @@ var proxyquire = module.exports = function (require_) {
 var clsc = function () {
   var args = arguments;
 
-  args = [].slice.call( args );
+  args = [ ].slice.call( args );
   for (var i = 0, len = args.length; i < len; i++) {
     var current = args[ i ];
-    if ( typeof current !== 'undefined' && current !== null  ) {
+    if ( typeof current !== 'undefined' && current !== null ) {
       return current;
     }
   }
@@ -93,34 +91,42 @@ var clsc = function () {
 // Start with the default cache
 proxyquire._cache = null;
 
-proxyquire._proxy = function (require_, request) {
+proxyquire._proxy = function ( require_, request ) {
   function original() {
-    return require_(request);
+    return require_( request );
   }
 
-  if (!stubs) return original();
+  if ( !stubs )
+    return original();
+  var stub = stubs[ request ];
 
-  var stub = stubs[request];
+  // if (!stub) return original();
+  if ( typeof stub === 'undefined' ) {
+    return original();
+  }
 
-  if (!stub) return original();
+  // this allows to replace the modules with null to simulate
+  // they cannot be loaded
+  if ( stub === null ) {
+    return null;
+  }
 
   var noCallThru = false;
 
-  if (!noCallThruGlobal) {
-    var stubWideNoCallThru = !!stubs['@noCallThru'] && stub['@noCallThru'] !== false;
-    noCallThru = stubWideNoCallThru || !!stub['@noCallThru'];
-  }
-  else {
-    noCallThru = clsc(stub['@noCallThru'], stubs['@noCallThru'], noCallThruGlobal)
+  if ( !noCallThruGlobal ) {
+    var stubWideNoCallThru = !!stubs[ '@noCallThru' ] && stub[ '@noCallThru' ] !== false;
+    noCallThru = stubWideNoCallThru || !!stub[ '@noCallThru' ];
+  } else {
+    noCallThru = clsc( stub[ '@noCallThru' ], stubs[ '@noCallThru' ], noCallThruGlobal )
   }
 
-  return noCallThru ? stub : fillMissingKeys(stub, original());
+  return noCallThru ? stub : fillMissingKeys( stub, original() );
 };
 
-if (require.cache) {
+if ( require.cache ) {
   // only used during build, so prevent browserify from including it
   var replacePreludePath = './lib/replace-prelude';
-  var replacePrelude = require(replacePreludePath);
+  var replacePrelude = require( replacePreludePath );
   proxyquire.browserify = replacePrelude.browserify;
   proxyquire.plugin = replacePrelude.plugin;
 }
