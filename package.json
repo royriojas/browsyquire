@@ -1,6 +1,6 @@
 {
   "name": "browsyquire",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "description": "Proxies browserify's require in order to allow overriding dependencies during testing.",
   "main": "index.js",
   "scripts": {
